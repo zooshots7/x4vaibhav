@@ -1,0 +1,32 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_KEY || '';
+
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('⚠️  Supabase credentials not set - database features will not work');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Database types
+export interface PaymentEvent {
+  id?: string;
+  created_at?: string;
+  endpoint: string;
+  amount: number;
+  token: 'STX' | 'sBTC' | 'USDCx';
+  status: 'success' | 'failed' | 'pending';
+  sender_address?: string;
+  transaction_hash?: string;
+  api_key: string;
+  metadata?: any;
+}
+
+export interface ApiKey {
+  id?: string;
+  created_at?: string;
+  api_key: string;
+  name: string;
+  active?: boolean;
+}
