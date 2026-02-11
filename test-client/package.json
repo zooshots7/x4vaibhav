@@ -1,0 +1,12 @@
+{
+  "name": "x402-test-client",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node client.js"
+  },
+  "dependencies": {
+    "x402-stacks": "^2.0.1",
+    "dotenv": "^17.2.4"
+  }
+}
