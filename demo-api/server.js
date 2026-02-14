@@ -62,7 +62,7 @@ app.get('/health', (req, res) => {
 app.get('/api/weather', 
   paymentMiddleware({
     amount: STXtoMicroSTX(0.005), // 0.005 STX per request
-    address: SERVER_ADDRESS,
+    payTo: SERVER_ADDRESS,
     network: NETWORK,
     facilitatorUrl: FACILITATOR_URL,
     description: 'Weather data API access',
@@ -89,7 +89,7 @@ app.get('/api/weather',
 app.get('/api/crypto-price',
   paymentMiddleware({
     amount: STXtoMicroSTX(0.003), // 0.003 STX per request
-    address: SERVER_ADDRESS,
+    payTo: SERVER_ADDRESS,
     network: NETWORK,
     facilitatorUrl: FACILITATOR_URL,
     description: 'Crypto price feed API',
@@ -112,7 +112,7 @@ app.get('/api/crypto-price',
 app.post('/api/ai-summary',
   paymentMiddleware({
     amount: STXtoMicroSTX(0.01), // 0.01 STX per summary
-    address: SERVER_ADDRESS,
+    payTo: SERVER_ADDRESS,
     network: NETWORK,
     facilitatorUrl: FACILITATOR_URL,
     description: 'AI text summarization',
@@ -144,7 +144,7 @@ app.post('/api/ai-summary',
 app.get('/api/random-fact',
   paymentMiddleware({
     amount: STXtoMicroSTX(0.001), // 0.001 STX per fact
-    address: SERVER_ADDRESS,
+    payTo: SERVER_ADDRESS,
     network: NETWORK,
     facilitatorUrl: FACILITATOR_URL,
     description: 'Random fact API',

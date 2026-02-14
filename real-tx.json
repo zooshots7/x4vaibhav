@@ -1,0 +1,9 @@
+{
+  "txId": "9735c1e158d9563aba8967070c81e6658d6f83cd5d5b05846d82306b9a3e64a4",
+  "amount": "0.005",
+  "token": "STX",
+  "timestamp": "2026-02-14T12:37:39.368Z",
+  "explorerUrl": "https://explorer.hiro.so/txid/9735c1e158d9563aba8967070c81e6658d6f83cd5d5b05846d82306b9a3e64a4?chain=testnet",
+  "endpoint": "/api/weather",
+  "memo": "x402Metrics test payment"
+}

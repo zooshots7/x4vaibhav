@@ -1,26 +1,172 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 🔥 Primary Orange Gradient */
+  --orange-bright: #FF6A00;
+  --orange-deep: #F24C00;
+  --orange-burnt: #D84315;
+  --orange-red: #C62828;
+  --red-deep: #8E1B13;
+  
+  /* 🌑 Dark Backgrounds */
+  --black-near: #0E0E0F;
+  --black-charcoal: #151515;
+  --black-brownish: #1C1210;
+  --shadow-deep: #2A0F0B;
+  
+  /* 🤍 Text & Light Elements */
+  --white-off: #F5F5F5;
+  --white-soft: #EAEAEA;
+  --grey-light: #CFCFCF;
+  --grey-medium: #9E9E9E;
+  
+  /* 🟠 Button Accents */
+  --orange-cta: #FF7A1A;
+  --orange-hover: #FF8C42;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Background Colors */
+  --color-bg-primary: var(--black-near);
+  --color-bg-secondary: var(--black-charcoal);
+  --color-bg-card: var(--black-brownish);
+  --color-bg-shadow: var(--shadow-deep);
+  
+  /* Text Colors */
+  --color-text-primary: var(--white-off);
+  --color-text-secondary: var(--white-soft);
+  --color-text-muted: var(--grey-light);
+  --color-text-grey: var(--grey-medium);
+  
+  /* Orange Gradient Colors */
+  --color-orange-bright: var(--orange-bright);
+  --color-orange-deep: var(--orange-deep);
+  --color-orange-burnt: var(--orange-burnt);
+  --color-orange-red: var(--orange-red);
+  --color-red-deep: var(--red-deep);
+  
+  /* Button Colors */
+  --color-btn-cta: var(--orange-cta);
+  --color-btn-hover: var(--orange-hover);
+  
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: linear-gradient(135deg, var(--black-near) 0%, var(--black-brownish) 50%, var(--shadow-deep) 100%);
+  background-attachment: fixed;
+  color: var(--white-off);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* 🔥 Glowing Orange Border Animation */
+@keyframes glow-orange {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 106, 0, 0.3),
+                0 0 10px rgba(255, 106, 0, 0.2),
+                0 0 20px rgba(255, 106, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.6),
+                0 0 20px rgba(255, 106, 0, 0.4),
+                0 0 40px rgba(255, 106, 0, 0.2);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes glow-orange-intense {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.5),
+                0 0 20px rgba(255, 106, 0, 0.3),
+                0 0 30px rgba(255, 106, 0, 0.2),
+                0 0 40px rgba(242, 76, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 106, 0, 0.8),
+                0 0 30px rgba(255, 106, 0, 0.6),
+                0 0 50px rgba(255, 106, 0, 0.4),
+                0 0 70px rgba(242, 76, 0, 0.2);
+  }
+}
+
+/* 🟠 Pulsing Dot Animation */
+@keyframes pulse-orange {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+/* 🔥 Gradient Background Animation */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ✨ Text Glow Animation */
+@keyframes text-glow-orange {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(255, 106, 0, 0.5),
+                 0 0 20px rgba(255, 106, 0, 0.3),
+                 0 0 30px rgba(242, 76, 0, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 106, 0, 0.8),
+                 0 0 40px rgba(255, 106, 0, 0.6),
+                 0 0 60px rgba(242, 76, 0, 0.4);
+  }
+}
+
+/* 🎯 Utility Classes */
+.glow-orange {
+  animation: glow-orange 2s ease-in-out infinite;
+}
+
+.glow-orange-intense {
+  animation: glow-orange-intense 3s ease-in-out infinite;
+}
+
+.pulse-orange {
+  animation: pulse-orange 2s ease-in-out infinite;
+}
+
+.gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.text-glow-orange {
+  animation: text-glow-orange 3s ease-in-out infinite;
+}
+
+/* 📜 Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(28, 18, 16, 0.5);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF6A00, #F24C00);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF8C42, #FF6A00);
 }
