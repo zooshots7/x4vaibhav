@@ -384,6 +384,34 @@ app.get('/api/security/alerts', async (req, res) => {
   }
 });
 
+// Post fraud alert (for demo/testing)
+app.post('/api/security/fraud-alert', async (req, res) => {
+  try {
+    const { type, severity, details, timestamp } = req.body;
+    
+    console.log(`🚨 FRAUD ALERT: ${type} (${severity})`, details);
+    
+    // In a real system, this would:
+    // 1. Store in fraud_alerts table
+    // 2. Trigger real-time notification via Socket.io
+    // 3. Update fraud analytics
+    
+    // Broadcast via Socket.io
+    io.emit('fraud:alert', {
+      type,
+      severity,
+      details,
+      timestamp: timestamp || new Date().toISOString()
+    });
+    
+    res.json({ success: true, message: 'Fraud alert logged' });
+    
+  } catch (error: any) {
+    console.error('Fraud alert error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== PROVIDER MARKETPLACE ENDPOINTS ====================
 
 // Mock provider storage (in production, use Supabase)
