@@ -171,7 +171,7 @@ body {
   background: linear-gradient(180deg, #FF8C42, #FF6A00);
 }
 
-/* 🎮 Game Animations */
+/* ✨ UI Animations */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
