@@ -22,10 +22,14 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Area, AreaChart } from 'recharts';
 import MarketplaceTab from '../components/MarketplaceTab';
 import HeroSection from '../components/HeroSection';
+import ConnectScreen from '../components/ConnectScreen';
+import ConnectWallet from '../components/ConnectWallet';
+import { useAuth } from '../contexts/AuthContext';
 
 type Tab = 'analytics' | 'credit' | 'security' | 'marketplace';
 
 export default function Home() {
+  const { isConnected, address } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('analytics');
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -280,6 +284,11 @@ export default function Home() {
     };
   }, []);
 
+  // Show connect screen if wallet not connected
+  if (!isConnected) {
+    return <ConnectScreen />;
+  }
+
   // Animated stat card with orange glow
   const StatCard = ({ icon: Icon, label, value, trend, color = "#00FFD4" }: any) => (
     <motion.div
@@ -318,26 +327,13 @@ export default function Home() {
         {/* Hero Section */}
         <HeroSection />
         
-        {/* Connection Status Badge */}
+        {/* Wallet Connection */}
         <motion.div 
           className="flex justify-end mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <motion.div 
-            className="flex items-center gap-3 px-4 py-2 rounded-full glass-card border border-[#0A1E1F]/50 glow-cyan"
-            animate={{ 
-              borderColor: connected ? '#00FFD4' : '#FF6464',
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className={`w-3 h-3 rounded-full ${connected ? 'bg-[#00FFD4]' : 'bg-[#FF6464]'} pulse-cyan`}
-            />
-            <span className="text-sm font-medium">
-              {connected ? '🔥 Live' : 'Disconnected'}
-            </span>
-          </motion.div>
+          <ConnectWallet />
         </motion.div>
 
         {/* Tabs */}

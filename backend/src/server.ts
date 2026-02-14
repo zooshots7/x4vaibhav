@@ -412,6 +412,34 @@ app.post('/api/security/fraud-alert', async (req, res) => {
   }
 });
 
+// ==================== USER AUTHENTICATION ====================
+
+// Register/update user when they connect wallet
+app.post('/api/users/register', async (req, res) => {
+  try {
+    const { wallet_address, timestamp } = req.body;
+    
+    if (!wallet_address) {
+      return res.status(400).json({ error: 'Wallet address required' });
+    }
+    
+    console.log('👤 User registration:', wallet_address.substring(0, 10) + '...');
+    
+    // For MVP, just acknowledge registration
+    // In production, you'd store in Supabase users table
+    res.json({ 
+      success: true, 
+      message: 'User registered',
+      wallet_address,
+      timestamp: timestamp || new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('User registration error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== PROVIDER MARKETPLACE ENDPOINTS ====================
 
 // Mock provider storage (in production, use Supabase)
