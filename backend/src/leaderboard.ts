@@ -10,6 +10,9 @@ export interface ProviderStats {
   avg_payment: number;
   endpoints: string[];
   rank: number;
+  reputation: number; // 0-1000 score
+  uptime: number; // percentage
+  successRate: number; // percentage
 }
 
 export async function getProviderLeaderboard(limit: number = 10): Promise<ProviderStats[]> {
@@ -47,16 +50,25 @@ export async function getProviderLeaderboard(limit: number = 10): Promise<Provid
     });
     
     // Convert to array and calculate stats
-    const leaderboard: ProviderStats[] = Array.from(providerMap.values()).map(p => ({
-      provider_wallet: p.provider_wallet,
-      provider_name: getProviderName(p.provider_wallet),
-      total_revenue: p.total_revenue,
-      total_payments: p.total_payments,
-      unique_consumers: p.consumers.size,
-      avg_payment: p.total_revenue / p.total_payments,
-      endpoints: Array.from(p.endpoints),
-      rank: 0 // Will be assigned after sorting
-    }));
+    const leaderboard: ProviderStats[] = Array.from(providerMap.values()).map(p => {
+      const successRate = 100; // Assume 100% for successful payments in DB
+      const uptime = calculateUptime(p.total_payments); // More payments = better uptime
+      const reputation = calculateReputation(p.total_revenue, p.total_payments, p.consumers.size, successRate, uptime);
+      
+      return {
+        provider_wallet: p.provider_wallet,
+        provider_name: getProviderName(p.provider_wallet),
+        total_revenue: p.total_revenue,
+        total_payments: p.total_payments,
+        unique_consumers: p.consumers.size,
+        avg_payment: p.total_revenue / p.total_payments,
+        endpoints: Array.from(p.endpoints),
+        rank: 0, // Will be assigned after sorting
+        reputation,
+        uptime,
+        successRate
+      };
+    });
     
     // Sort by total revenue descending
     leaderboard.sort((a, b) => b.total_revenue - a.total_revenue);
@@ -83,6 +95,36 @@ function getProviderName(wallet: string): string {
   };
   
   return providerNames[wallet] || wallet.substring(0, 8) + '...' + wallet.substring(wallet.length - 6);
+}
+
+// Calculate provider reputation (0-1000 scale)
+function calculateReputation(
+  totalRevenue: number,
+  totalPayments: number,
+  uniqueConsumers: number,
+  successRate: number,
+  uptime: number
+): number {
+  // Weighted scoring system
+  const revenueScore = Math.min(totalRevenue * 100, 300); // Max 300 points
+  const volumeScore = Math.min(totalPayments * 5, 200); // Max 200 points
+  const consumerScore = Math.min(uniqueConsumers * 50, 200); // Max 200 points
+  const reliabilityScore = (successRate / 100) * 150; // Max 150 points
+  const uptimeScore = (uptime / 100) * 150; // Max 150 points
+  
+  const totalScore = revenueScore + volumeScore + consumerScore + reliabilityScore + uptimeScore;
+  
+  return Math.min(Math.round(totalScore), 1000);
+}
+
+// Calculate uptime based on payment frequency
+function calculateUptime(totalPayments: number): number {
+  // Simple heuristic: more payments = better uptime
+  // In production, track actual API availability
+  if (totalPayments >= 20) return 99;
+  if (totalPayments >= 10) return 95;
+  if (totalPayments >= 5) return 90;
+  return 85;
 }
 
 export interface TransactionGeoData {

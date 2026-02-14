@@ -130,6 +130,24 @@ export default function ProviderLeaderboard() {
                           <span>{provider.endpoints.length} endpoints</span>
                         </div>
                       </div>
+                      
+                      {/* Reputation Badge */}
+                      {provider.reputation && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                            provider.reputation >= 800 ? 'bg-green-500/20 text-green-400' :
+                            provider.reputation >= 600 ? 'bg-blue-500/20 text-blue-400' :
+                            provider.reputation >= 400 ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            <span>⭐</span>
+                            <span>{provider.reputation}/1000 Reputation</span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {provider.uptime}% uptime • {provider.successRate}% success
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

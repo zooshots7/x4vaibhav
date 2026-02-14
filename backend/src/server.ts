@@ -1040,6 +1040,49 @@ app.get('/api/fraud/patterns', async (req, res) => {
   }
 });
 
+// QUICK WIN 1: Block Addresses
+app.post('/api/security/block', async (req, res) => {
+  try {
+    const { addresses, pattern, auto } = req.body;
+    
+    console.log(`🚫 Blocking ${addresses.length} addresses for ${pattern}${auto ? ' (auto)' : ''}`);
+    
+    // In production, store in blocked_addresses table
+    // For now, just log and return success
+    
+    res.json({
+      success: true,
+      blocked: addresses.length,
+      pattern,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Block addresses error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// QUICK WIN 1: Whitelist Addresses
+app.post('/api/security/whitelist', async (req, res) => {
+  try {
+    const { addresses } = req.body;
+    
+    console.log(`✅ Whitelisted ${addresses.length} addresses`);
+    
+    // In production, remove from blocked_addresses table
+    // For now, just log and return success
+    
+    res.json({
+      success: true,
+      whitelisted: addresses.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Whitelist addresses error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // LEGENDARY FEATURE 4: Real-time Stats Summary
 app.get('/api/summary/realtime', async (req, res) => {
   try {

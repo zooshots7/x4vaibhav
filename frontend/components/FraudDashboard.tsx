@@ -15,12 +15,25 @@ interface FraudPattern {
 export default function FraudDashboard() {
   const [patterns, setPatterns] = useState<FraudPattern[]>([]);
   const [loading, setLoading] = useState(true);
+  const [blockedAddresses, setBlockedAddresses] = useState<Set<string>>(new Set());
+  const [autoBlockEnabled, setAutoBlockEnabled] = useState(false);
 
   useEffect(() => {
     fetchPatterns();
     const interval = setInterval(fetchPatterns, 20000); // Refresh every 20s
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Auto-block high severity patterns if enabled
+    if (autoBlockEnabled) {
+      patterns.forEach(pattern => {
+        if (pattern.severity === 'high') {
+          handleBlockAddresses(pattern.addresses, pattern.type, true);
+        }
+      });
+    }
+  }, [patterns, autoBlockEnabled]);
 
   const fetchPatterns = async () => {
     try {
@@ -31,6 +44,48 @@ export default function FraudDashboard() {
     } catch (error) {
       console.error('Failed to fetch fraud patterns:', error);
       setLoading(false);
+    }
+  };
+
+  const handleBlockAddresses = async (addresses: string[], patternType: string, auto = false) => {
+    try {
+      // Add to blocked list
+      const newBlocked = new Set(blockedAddresses);
+      addresses.forEach(addr => newBlocked.add(addr));
+      setBlockedAddresses(newBlocked);
+
+      // Call backend to block
+      await fetch('http://localhost:3001/api/security/block', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addresses, pattern: patternType, auto })
+      });
+
+      if (!auto) {
+        alert(`✅ Blocked ${addresses.length} addresses for ${patternType}`);
+      }
+    } catch (error) {
+      console.error('Failed to block addresses:', error);
+    }
+  };
+
+  const handleMarkSafe = async (addresses: string[]) => {
+    try {
+      // Remove from blocked list
+      const newBlocked = new Set(blockedAddresses);
+      addresses.forEach(addr => newBlocked.delete(addr));
+      setBlockedAddresses(newBlocked);
+
+      // Call backend to whitelist
+      await fetch('http://localhost:3001/api/security/whitelist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addresses })
+      });
+
+      alert(`✅ Marked ${addresses.length} addresses as safe`);
+    } catch (error) {
+      console.error('Failed to mark safe:', error);
     }
   };
 
@@ -155,13 +210,34 @@ export default function FraudDashboard() {
 
       {/* Pattern Details */}
       <div className="glass-card p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Fraud Patterns Detected</h2>
+              <p className="text-sm text-gray-400">Real-time anomaly detection</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">Fraud Patterns Detected</h2>
-            <p className="text-sm text-gray-400">Real-time anomaly detection</p>
+
+          {/* Auto-Block Toggle */}
+          <div className="flex items-center gap-3 glass-pill px-4 py-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={autoBlockEnabled}
+                onChange={(e) => setAutoBlockEnabled(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600 text-red-500 focus:ring-red-500"
+              />
+              <span className="text-sm font-semibold text-white">Auto-Block High Risk</span>
+            </label>
+            {autoBlockEnabled && (
+              <div className="flex items-center gap-1 text-xs text-red-400">
+                <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div>
+                Active
+              </div>
+            )}
           </div>
         </div>
 
@@ -242,13 +318,20 @@ export default function FraudDashboard() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-3 pt-4 border-t border-gray-700/50">
-                      <button className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-semibold transition-colors">
-                        Block Addresses
+                      <button 
+                        onClick={() => handleBlockAddresses(pattern.addresses, pattern.type)}
+                        className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-semibold transition-colors flex items-center gap-2"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Block All ({pattern.count})
                       </button>
                       <button className="px-4 py-2 rounded-lg bg-gray-700/50 hover:bg-gray-700 text-gray-300 text-sm font-semibold transition-colors">
                         View Details
                       </button>
-                      <button className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 text-sm font-semibold transition-colors ml-auto">
+                      <button 
+                        onClick={() => handleMarkSafe(pattern.addresses)}
+                        className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 text-sm font-semibold transition-colors ml-auto"
+                      >
                         Mark as Safe
                       </button>
                     </div>
