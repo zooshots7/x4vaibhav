@@ -576,10 +576,21 @@ export default function Home() {
 
               {/* Payment Feed */}
               <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20 shadow-2xl glow-cyan">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-[#00FFD4]" />
-                  Live Payment Feed
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-[#00FFD4]" />
+                    Live Payment Feed
+                  </h2>
+                  <a
+                    href="https://explorer.hiro.so/address/ST1Z6ZQD1D8QQH6JBK1VV52SSXSQZT5NCK59BS914?chain=testnet"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#00E5CC] hover:text-[#00D4FF] flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-[#00FFD4]/30 hover:border-[#00FFD4]/60"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View All on Explorer
+                  </a>
+                </div>
                 
                 {payments.length === 0 ? (
                   <div className="text-center py-12">
