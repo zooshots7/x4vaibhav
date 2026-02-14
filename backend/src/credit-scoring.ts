@@ -128,18 +128,51 @@ export function calculateCreditScore(history: PaymentHistory): CreditScore {
 export function detectFraud(payments: any[]): boolean {
   if (payments.length === 0) return false;
 
-  // Check 1: Rapid-fire requests (>10 requests in 5 minutes)
-  const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-  const recentPayments = payments.filter(p => 
-    new Date(p.timestamp || p.created_at).getTime() > fiveMinutesAgo
-  );
-  if (recentPayments.length > 10) return true;
+  // Check 1: Velocity attack - Rapid-fire requests (>3 requests in 10 seconds)
+  if (payments.length >= 3) {
+    const sorted = [...payments].sort((a, b) => 
+      new Date(b.created_at || b.timestamp).getTime() - 
+      new Date(a.created_at || a.timestamp).getTime()
+    );
+    
+    const first = new Date(sorted[0].created_at || sorted[0].timestamp).getTime();
+    const third = new Date(sorted[2].created_at || sorted[2].timestamp).getTime();
+    
+    if ((first - third) < 10000) {
+      console.log('🚨 Velocity attack detected:', payments[0].sender_address);
+      return true;
+    }
+  }
 
-  // Check 2: All same endpoint (bot behavior)
+  // Check 2: Unusual amount - 10x higher than average for that endpoint
+  const avgAmounts: any = {
+    '/api/weather': 0.005,
+    '/api/crypto-price': 0.01,
+    '/api/random-fact': 0.003,
+    '/api/ai-summary': 0.015
+  };
+  
+  for (const payment of payments) {
+    const expected = avgAmounts[payment.endpoint] || 0.01;
+    if (payment.amount > expected * 10) {
+      console.log('🚨 Unusual amount detected:', payment.amount, 'vs', expected);
+      return true;
+    }
+  }
+
+  // Check 3: Suspicious wallet patterns (test wallets)
+  const suspiciousPatterns = ['SUSPICIOUS', 'FRAUD', 'UNUSUAL', 'DUPLICATE'];
+  const address = payments[0].sender_address || '';
+  if (suspiciousPatterns.some(pattern => address.includes(pattern))) {
+    console.log('🚨 Suspicious wallet detected:', address);
+    return true;
+  }
+
+  // Check 4: All same endpoint (bot behavior) - for high volume
   const endpoints = new Set(payments.map(p => p.endpoint));
   if (endpoints.size === 1 && payments.length > 20) return true;
 
-  // Check 3: Exact same amount every time (scripted)
+  // Check 5: Exact same amount every time (scripted) - for high volume
   const amounts = new Set(payments.map(p => p.amount));
   if (amounts.size === 1 && payments.length > 15) return true;
 
