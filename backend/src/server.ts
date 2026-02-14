@@ -6,6 +6,7 @@ import http from 'http';
 import { supabase, PaymentEvent } from './supabase';
 import { calculateCreditScore, detectFraud } from './credit-scoring';
 import { Provider, ProviderEndpoint, calculateRevenueSplit, ENDPOINT_CATEGORIES } from './providers';
+import { getProviderLeaderboard, generateTransactionMap, detectFraudPatterns } from './leaderboard';
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ app.get('/health', (req, res) => {
 // Payment webhook - called by demo API when payment succeeds
 app.post('/webhook/payment', async (req, res) => {
   try {
-    const { endpoint, amount, token, payer, txHash, timestamp, sender_address, transaction_hash, status = 'success', metadata } = req.body;
+    const { endpoint, amount, token, payer, txHash, timestamp, sender_address, transaction_hash, status = 'success', metadata, provider_wallet } = req.body;
     
     // Support both naming conventions
     const finalPayer = sender_address || payer;
@@ -61,6 +62,7 @@ app.post('/webhook/payment', async (req, res) => {
         sender_address: finalPayer,
         transaction_hash: finalTxHash,
         api_key: 'real-blockchain-payment',
+        provider_wallet: provider_wallet || null, // NEW: Track which provider owns this endpoint
         metadata: metadata || { 
           timestamp: timestamp || new Date().toISOString(),
           webhook_received: new Date().toISOString()
@@ -102,12 +104,24 @@ app.post('/webhook/payment', async (req, res) => {
   }
 });
 
-// Analytics: Overall stats
+// Analytics: Overall stats (wallet-filtered)
 app.get('/api/stats', async (req, res) => {
   try {
-    const { data: payments, error } = await supabase
-      .from('payment_events')
-      .select('amount, token, status');
+    const wallet = req.query.wallet as string;
+    const role = req.query.role as string; // 'provider' | 'consumer' | 'both'
+    
+    let query = supabase.from('payment_events').select('amount, token, status, sender_address, endpoint, provider_wallet');
+    
+    // Filter based on role (BEFORE executing query)
+    if (wallet && role === 'consumer') {
+      // Consumers: show payments THEY made
+      query = query.eq('sender_address', wallet);
+    } else if (wallet && role === 'provider') {
+      // Providers: show payments TO their endpoints
+      query = query.eq('provider_wallet', wallet);
+    }
+    
+    const { data: payments, error } = await query;
     
     if (error) throw error;
     
@@ -125,7 +139,9 @@ app.get('/api/stats', async (req, res) => {
       successRate: parseFloat(successRate),
       avgPayment: successfulPayments.length > 0 
         ? (totalRevenue / successfulPayments.length).toFixed(6) 
-        : '0'
+        : '0',
+      wallet,
+      role
     });
   } catch (error: any) {
     console.error('Stats error:', error);
@@ -133,16 +149,28 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// Analytics: Recent payments
+// Analytics: Recent payments (wallet-filtered)
 app.get('/api/payments/recent', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
+    const wallet = req.query.wallet as string;
+    const role = req.query.role as string;
     
-    const { data, error } = await supabase
-      .from('payment_events')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    let query = supabase.from('payment_events').select('*');
+    
+    // Filter based on role (BEFORE order/limit)
+    if (wallet && role === 'consumer') {
+      // Consumers: show payments THEY made
+      query = query.eq('sender_address', wallet);
+    } else if (wallet && role === 'provider') {
+      // Providers: show payments TO their endpoints
+      query = query.eq('provider_wallet', wallet);
+    }
+    
+    // Apply order and limit after filters
+    query = query.order('created_at', { ascending: false }).limit(limit);
+    
+    const { data, error } = await query;
     
     if (error) throw error;
     res.json(data || []);
@@ -174,13 +202,27 @@ app.get('/api/analytics/by-token', async (req, res) => {
   }
 });
 
-// Analytics: By endpoint
+// Analytics: By endpoint (wallet-filtered)
 app.get('/api/analytics/by-endpoint', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const wallet = req.query.wallet as string;
+    const role = req.query.role as string;
+    
+    let query = supabase
       .from('payment_events')
-      .select('endpoint, amount')
-      .eq('status', 'success');
+      .select('endpoint, amount, sender_address, provider_wallet');
+    
+    // Filter based on role (BEFORE other conditions)
+    if (wallet && role === 'consumer') {
+      query = query.eq('sender_address', wallet);
+    } else if (wallet && role === 'provider') {
+      query = query.eq('provider_wallet', wallet);
+    }
+    
+    // Apply success filter after wallet filter
+    query = query.eq('status', 'success');
+    
+    const { data, error } = await query;
     
     if (error) throw error;
     
@@ -929,6 +971,129 @@ app.get('/api/savings/:address', async (req, res) => {
       recommendations: creditScore.recommendations
     });
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== LEGENDARY FEATURES ====================
+
+// LEGENDARY FEATURE 1: Provider Leaderboard
+app.get('/api/leaderboard/providers', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+    const leaderboard = await getProviderLeaderboard(limit);
+    
+    res.json({
+      success: true,
+      count: leaderboard.length,
+      leaderboard
+    });
+  } catch (error: any) {
+    console.error('Provider leaderboard error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// LEGENDARY FEATURE 2: Live Transaction Map
+app.get('/api/map/transactions', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    // Get recent successful payments
+    const { data: payments, error } = await supabase
+      .from('payment_events')
+      .select('*')
+      .eq('status', 'success')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) throw error;
+    
+    const mapData = generateTransactionMap(payments || []);
+    
+    res.json({
+      success: true,
+      count: mapData.length,
+      transactions: mapData,
+      lastUpdate: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Transaction map error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// LEGENDARY FEATURE 3: Enhanced Fraud Patterns
+app.get('/api/fraud/patterns', async (req, res) => {
+  try {
+    const patterns = await detectFraudPatterns();
+    
+    res.json({
+      success: true,
+      patternCount: patterns.length,
+      patterns,
+      analyzedAt: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Fraud patterns error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// LEGENDARY FEATURE 4: Real-time Stats Summary
+app.get('/api/summary/realtime', async (req, res) => {
+  try {
+    const wallet = req.query.wallet as string;
+    const role = req.query.role as string;
+    
+    // Get last hour activity
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    
+    let query = supabase
+      .from('payment_events')
+      .select('*')
+      .gte('created_at', oneHourAgo);
+    
+    if (wallet && role === 'consumer') {
+      query = query.eq('sender_address', wallet);
+    } else if (wallet && role === 'provider') {
+      query = query.eq('provider_wallet', wallet);
+    }
+    
+    const { data: recentPayments, error } = await query;
+    
+    if (error) throw error;
+    
+    const successfulPayments = recentPayments?.filter(p => p.status === 'success') || [];
+    const totalRevenue = successfulPayments.reduce((sum, p) => 
+      sum + parseFloat(p.amount.toString()), 0
+    );
+    
+    // Get fraud alerts count
+    const patterns = await detectFraudPatterns();
+    const highSeverityAlerts = patterns.filter(p => p.severity === 'high').length;
+    
+    // Get provider leaderboard
+    const leaderboard = await getProviderLeaderboard(3);
+    
+    res.json({
+      success: true,
+      timeWindow: '1h',
+      activity: {
+        totalPayments: recentPayments?.length || 0,
+        successfulPayments: successfulPayments.length,
+        revenue: totalRevenue.toFixed(6),
+        uniqueConsumers: new Set(recentPayments?.map(p => p.sender_address)).size,
+        uniqueProviders: new Set(recentPayments?.map(p => p.provider_wallet)).size
+      },
+      security: {
+        fraudPatternsDetected: patterns.length,
+        highSeverityAlerts
+      },
+      topProviders: leaderboard.slice(0, 3)
+    });
+  } catch (error: any) {
+    console.error('Realtime summary error:', error);
     res.status(500).json({ error: error.message });
   }
 });

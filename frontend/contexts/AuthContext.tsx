@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AppConfig, UserSession, showConnect } from '@stacks/connect';
+import { AppConfig, UserSession } from '@stacks/auth';
+import { authenticate } from '@stacks/connect';
 import { StacksTestnet } from '@stacks/network';
 
 interface AuthContextType {
@@ -28,80 +29,117 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check if user is already logged in
   useEffect(() => {
-    if (userSession.isUserSignedIn()) {
-      const userData = userSession.loadUserData();
-      const walletAddress = userData.profile.stxAddress.testnet;
-      setAddress(walletAddress);
-      setIsConnected(true);
-      
-      // Load saved view preference
-      const savedView = localStorage.getItem('x402_view');
-      if (savedView === 'consumer' || savedView === 'provider') {
-        setCurrentView(savedView);
+    try {
+      if (userSession.isUserSignedIn()) {
+        const userData = userSession.loadUserData();
+        const walletAddress = userData.profile.stxAddress.testnet;
+        setAddress(walletAddress);
+        setIsConnected(true);
+        
+        // Load saved view preference
+        const savedView = localStorage.getItem('x402_view');
+        if (savedView === 'consumer' || savedView === 'provider') {
+          setCurrentView(savedView);
+        }
+        
+        // Detect role based on transaction history
+        detectRole(walletAddress);
       }
-      
-      // Detect role based on transaction history
-      detectRole(walletAddress);
+    } catch (error) {
+      console.error('Error loading user session:', error);
+      // Clear corrupted session data
+      try {
+        userSession.signUserOut();
+      } catch (e) {
+        // Manually clear localStorage if signUserOut fails
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('blockstack-session');
+          localStorage.removeItem('blockstack-transit-private-key');
+        }
+      }
+      setAddress(null);
+      setIsConnected(false);
     }
   }, [userSession]);
 
   const detectRole = async (walletAddress: string) => {
     try {
-      // Check if wallet has received payments (provider)
-      const response = await fetch(`http://localhost:3001/api/payments/recent?limit=1000`);
+      // Check wallet's role based on payment history
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/payments/recent?limit=1000`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch payments');
+      }
+      
       const payments = await response.json();
       
-      const receivedPayments = payments.filter((p: any) => 
-        p.sender_address && p.sender_address !== walletAddress
+      // Provider: Owns endpoints (provider_wallet matches)
+      const providerPayments = payments.filter((p: any) => 
+        p.provider_wallet === walletAddress
       );
       
-      const sentPayments = payments.filter((p: any) => 
+      // Consumer: Made payments (sender_address matches)
+      const consumerPayments = payments.filter((p: any) => 
         p.sender_address === walletAddress
       );
       
-      if (receivedPayments.length > 0 && sentPayments.length > 0) {
+      console.log('Role detection:', {
+        wallet: walletAddress.substring(0, 10) + '...',
+        providerPayments: providerPayments.length,
+        consumerPayments: consumerPayments.length
+      });
+      
+      if (providerPayments.length > 0 && consumerPayments.length > 0) {
         setRole('both');
-      } else if (receivedPayments.length > 0) {
+        // Default to provider view for "both"
+        setCurrentView('provider');
+      } else if (providerPayments.length > 0) {
         setRole('provider');
         setCurrentView('provider');
-      } else if (sentPayments.length > 0) {
+      } else if (consumerPayments.length > 0) {
         setRole('consumer');
         setCurrentView('consumer');
       } else {
         setRole('consumer'); // Default to consumer for new users
+        setCurrentView('consumer');
       }
     } catch (error) {
       console.error('Error detecting role:', error);
       setRole('consumer');
+      setCurrentView('consumer');
     }
   };
 
-  const connectWallet = () => {
-    showConnect({
-      appDetails: {
-        name: 'x402Metrics',
-        icon: window.location.origin + '/favicon.ico',
-      },
-      redirectTo: '/',
-      onFinish: () => {
-        const userData = userSession.loadUserData();
-        const walletAddress = userData.profile.stxAddress.testnet;
-        setAddress(walletAddress);
-        setIsConnected(true);
-        detectRole(walletAddress);
-        
-        // Register user on backend
-        fetch('http://localhost:3001/api/users/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            wallet_address: walletAddress,
-            timestamp: new Date().toISOString()
-          })
-        }).catch(console.error);
-      },
-      userSession,
-    });
+  const connectWallet = async () => {
+    try {
+      await authenticate({
+        userSession,
+        onFinish: ({ userSession: newUserSession }) => {
+          const userData = newUserSession.loadUserData();
+          const walletAddress = userData.profile.stxAddress.testnet;
+          setAddress(walletAddress);
+          setIsConnected(true);
+          detectRole(walletAddress);
+          
+          // Register user on backend
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+          fetch(`${backendUrl}/api/users/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              wallet_address: walletAddress,
+              timestamp: new Date().toISOString()
+            })
+          }).catch(console.error);
+        },
+        onCancel: (error) => {
+          console.log('User canceled authentication:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+    }
   };
 
   const disconnectWallet = () => {

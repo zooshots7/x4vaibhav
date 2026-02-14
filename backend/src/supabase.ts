@@ -29,6 +29,7 @@ export interface PaymentEvent {
   sender_address?: string;
   transaction_hash?: string;
   api_key: string;
+  provider_wallet?: string; // NEW: Which provider owns this endpoint
   metadata?: any;
 }
 

@@ -40,18 +40,19 @@ export default function ConnectWallet() {
         </div>
       )}
 
-      {/* Wallet Address Display */}
-      <div className="flex items-center gap-3 px-4 py-2 rounded-lg glass-card border border-[#00FFD4]/30">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#00FFD4] pulse-cyan" />
-          <span className="text-sm font-mono text-[#00FFD4]">
-            {address?.substring(0, 6)}...{address?.substring(address.length - 4)}
+      {/* Wallet Address + Role Display */}
+      <div className="flex items-center gap-2">
+        {/* Connection indicator + Address Badge */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#00FFD4] border border-[#00FFD4]">
+          <div className="w-2 h-2 rounded-full bg-[#0A2C2D] animate-pulse" />
+          <span className="text-xs font-mono font-bold text-[#0A2C2D]">
+            {address?.substring(0, 10)}...{address?.substring(address.length - 8)}
           </span>
         </div>
         
         {/* Role Badge */}
         {role && (
-          <span className="px-2 py-0.5 rounded text-xs font-medium bg-[#00FFD4]/20 text-[#00FFD4] border border-[#00FFD4]/30">
+          <span className="px-3 py-1.5 rounded-lg bg-[#00FFD4]/20 text-[#00FFD4] text-xs font-semibold border border-[#00FFD4]/30 capitalize">
             {role === 'both' ? currentView : role}
           </span>
         )}

@@ -25,11 +25,14 @@ import HeroSection from '../components/HeroSection';
 import ConnectScreen from '../components/ConnectScreen';
 import ConnectWallet from '../components/ConnectWallet';
 import { useAuth } from '../contexts/AuthContext';
+import ProviderLeaderboard from '../components/ProviderLeaderboard';
+import TransactionMap from '../components/TransactionMap';
+import FraudDashboard from '../components/FraudDashboard';
 
 type Tab = 'analytics' | 'credit' | 'security' | 'marketplace';
 
 export default function Home() {
-  const { isConnected, address } = useAuth();
+  const { isConnected, address, currentView, switchRole } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('analytics');
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -63,21 +66,24 @@ export default function Home() {
   const [savingsData, setSavingsData] = useState<any>(null);
   const [webhookTestResult, setWebhookTestResult] = useState<any>(null);
 
-  // Fetch initial data
+  // Fetch initial data (wallet-filtered)
   const fetchData = async () => {
     try {
-      const statsRes = await fetch('http://localhost:3001/api/stats');
+      // Build query params with wallet and role
+      const walletParam = address ? `?wallet=${address}&role=${currentView}` : '';
+      
+      const statsRes = await fetch(`http://localhost:3001/api/stats${walletParam}`);
       const statsData = await statsRes.json();
       setStats(statsData);
 
-      const paymentsRes = await fetch('http://localhost:3001/api/payments/recent?limit=20');
+      const paymentsRes = await fetch(`http://localhost:3001/api/payments/recent?limit=20${address ? `&wallet=${address}&role=${currentView}` : ''}`);
       const paymentsData = await paymentsRes.json();
       setPayments(paymentsData);
       
       buildRevenueHistory(paymentsData);
       
       // Fetch token breakdown
-      const tokenRes = await fetch('http://localhost:3001/api/analytics/by-token');
+      const tokenRes = await fetch(`http://localhost:3001/api/analytics/by-token${walletParam}`);
       const tokenBreakdown = await tokenRes.json();
       const tokenChartData = Object.entries(tokenBreakdown).map(([token, amount]: any) => ({
         name: token,
@@ -86,7 +92,7 @@ export default function Home() {
       setTokenData(tokenChartData);
       
       // Fetch endpoint breakdown
-      const endpointRes = await fetch('http://localhost:3001/api/analytics/by-endpoint');
+      const endpointRes = await fetch(`http://localhost:3001/api/analytics/by-endpoint${walletParam}`);
       const endpointBreakdown = await endpointRes.json();
       const endpointChartData = Object.entries(endpointBreakdown).map(([endpoint, data]: any) => ({
         name: endpoint.replace('/api/', ''),
@@ -284,6 +290,16 @@ export default function Home() {
     };
   }, []);
 
+  // Re-fetch data when wallet or role changes
+  useEffect(() => {
+    if (isConnected) {
+      fetchData();
+      fetchCreditData();
+      fetchSecurityData();
+      fetchMarketplaceData();
+    }
+  }, [address, currentView, isConnected]);
+
   // Show connect screen if wallet not connected
   if (!isConnected) {
     return <ConnectScreen />;
@@ -327,12 +343,23 @@ export default function Home() {
         {/* Hero Section */}
         <HeroSection />
         
-        {/* Wallet Connection */}
+        {/* Wallet Connection & Role Switcher */}
         <motion.div 
-          className="flex justify-end mb-6"
+          className="flex justify-between items-center mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
+          <div className="px-4 py-2 rounded-lg glass-card border border-[#00FFD4]/20 flex items-center gap-3">
+            <span className="text-sm text-[#C5D5E0]">Viewing as:</span>
+            <select
+              value={currentView}
+              onChange={(e) => switchRole(e.target.value as 'provider' | 'consumer')}
+              className="bg-transparent text-[#00E5CC] text-sm font-bold border-none outline-none cursor-pointer capitalize"
+            >
+              <option value="provider" className="bg-[#0A2C2D] text-[#00FFD4]">Provider</option>
+              <option value="consumer" className="bg-[#0A2C2D] text-[#00FFD4]">Consumer</option>
+            </select>
+          </div>
           <ConnectWallet />
         </motion.div>
 
@@ -641,6 +668,16 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              {/* LEGENDARY: Provider Leaderboard */}
+              <div className="mb-8">
+                <ProviderLeaderboard />
+              </div>
+
+              {/* LEGENDARY: Live Transaction Map */}
+              <div className="mb-8">
+                <TransactionMap />
+              </div>
             </motion.div>
           )}
 
@@ -787,66 +824,8 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              {/* Fraud Analytics Stats */}
-              {fraudData && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                  <StatCard icon={Users} label="Total Addresses" value={fraudData.totalAddresses} />
-                  <StatCard icon={AlertTriangle} label="Fraud Alerts" value={fraudData.fraudulentAddresses} color="#FF6464" />
-                  <StatCard icon={Shield} label="Fraud Rate" value={`${fraudData.fraudRate}%`} color="#10b981" />
-                </div>
-              )}
-              
-              <div className="rounded-xl p-6 glass-card border border-[#0A1E1F]/50">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-red-400" />
-                  Security Alerts {fraudData && fraudData.alerts && `(${fraudData.alerts.length} detected)`}
-                </h2>
-                
-                {alerts.length === 0 ? (
-                  <div className="text-center py-12">
-                    <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                    <p className="text-[#C5D5E0]">No security threats detected</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {alerts.map((alert, i) => (
-                      <motion.div
-                        key={alert.address}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className={`p-4 rounded-lg border ${
-                          alert.severity === 'high' 
-                            ? 'bg-red-900/20 border-red-500/50' 
-                            : 'bg-yellow-900/20 border-yellow-500/50'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <AlertTriangle className={`w-5 h-5 ${
-                              alert.severity === 'high' ? 'text-red-400' : 'text-yellow-400'
-                            }`} />
-                            <div>
-                              <div className="font-mono text-sm font-bold">{alert.address}</div>
-                              <div className="text-sm text-slate-300 mt-1">{alert.reason}</div>
-                              <div className="text-xs text-[#9E9E9E] mt-2">
-                                {alert.totalPayments} payments • Last seen: {new Date(alert.lastSeen).toLocaleString()}
-                              </div>
-                            </div>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            alert.severity === 'high'
-                              ? 'bg-[#FF6464]/20 text-red-400'
-                              : 'bg-yellow-500/20 text-yellow-400'
-                          }`}>
-                            {alert.severity.toUpperCase()}
-                          </span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* LEGENDARY: Enhanced Fraud Dashboard */}
+              <FraudDashboard />
             </motion.div>
           )}
         </AnimatePresence>
