@@ -237,9 +237,9 @@ export default function Home() {
       fetchHeatmapData();
       toast.success('🎉 Connected to real-time feed!', {
         style: {
-          background: '#0A2C2D',
+          background: '#1C1210',
           color: '#fff',
-          border: '1px solid #00FFD4'
+          border: '1px solid #FF6A00'
         }
       });
     });
@@ -264,9 +264,9 @@ export default function Home() {
         </div>,
         {
           style: {
-            background: '#0A2C2D',
+            background: '#1C1210',
             color: '#fff',
-            border: '1px solid #00D4FF'
+            border: '1px solid #FF8C42'
           },
           duration: 3000
         }
@@ -281,24 +281,24 @@ export default function Home() {
   }, []);
 
   // Animated stat card with orange glow
-  const StatCard = ({ icon: Icon, label, value, trend, color = "#00FFD4" }: any) => (
+  const StatCard = ({ icon: Icon, label, value, trend, color = "#FF6A00" }: any) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.05, y: -8 }}
       transition={{ duration: 0.3 }}
-      className="relative overflow-hidden rounded-xl p-6 glass-card border border-[#00FFD4]/30 shadow-2xl glow-cyan"
+      className="relative overflow-hidden rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/30 shadow-2xl glow-orange"
     >
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#00FFD4]/5 to-transparent opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FF6A00]/5 to-transparent opacity-50" />
       
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-2">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-[#00FFD4]/20 to-[#00D4FF]/10 border border-[#00FFD4]/30">
-            <Icon className="w-6 h-6 text-[#00E5CC]" />
+          <div className="p-3 rounded-xl bg-gradient-to-br from-[#FF6A00]/20 to-[#F24C00]/10 border border-[#FF6A00]/30">
+            <Icon className="w-6 h-6 text-[#FF7A1A]" />
           </div>
           {trend && (
-            <span className="text-xs text-[#00D4FF] flex items-center gap-1 font-semibold">
+            <span className="text-xs text-[#FF8C42] flex items-center gap-1 font-semibold">
               <TrendingUp className="w-3 h-3" />
               {trend}
             </span>
@@ -325,14 +325,14 @@ export default function Home() {
           animate={{ opacity: 1 }}
         >
           <motion.div 
-            className="flex items-center gap-3 px-4 py-2 rounded-full glass-card border border-[#0A1E1F]/50 glow-cyan"
+            className="flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-xl bg-[#1C1210]/90 border border-[#2A0F0B]/50 glow-orange"
             animate={{ 
-              borderColor: connected ? '#00FFD4' : '#FF6464',
+              borderColor: connected ? '#FF6A00' : '#C62828',
             }}
             transition={{ duration: 0.3 }}
           >
             <motion.div 
-              className={`w-3 h-3 rounded-full ${connected ? 'bg-[#00FFD4]' : 'bg-[#FF6464]'} pulse-cyan`}
+              className={`w-3 h-3 rounded-full ${connected ? 'bg-[#FF6A00]' : 'bg-[#C62828]'} pulse-orange`}
             />
             <span className="text-sm font-medium">
               {connected ? '🔥 Live' : 'Disconnected'}
@@ -353,8 +353,8 @@ export default function Home() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-[#00FFD4]/30 to-[#00D4FF]/20 text-[#00E5CC] border border-[#00FFD4]/70 glow-cyan shadow-[0_0_30px_rgba(255,106,0,0.4)]'
-                  : 'bg-[#0A2C2D]/90 text-[#C5D5E0] border border-[#0A1E1F]/50 hover:border-[#00FFD4]/30 hover:text-[#00D4FF]'
+                  ? 'bg-gradient-to-r from-[#FF6A00]/30 to-[#F24C00]/20 text-[#FF7A1A] border border-[#FF6A00]/70 glow-orange shadow-[0_0_30px_rgba(255,106,0,0.4)]'
+                  : 'bg-[#1C1210]/90 text-[#CFCFCF] border border-[#2A0F0B]/50 hover:border-[#FF6A00]/30 hover:text-[#FF8C42]'
               }`}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -405,22 +405,22 @@ export default function Home() {
               {/* NEW: Export & Tools Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Export Reports */}
-                <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20">
+                <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/20">
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <ExternalLink className="w-5 h-5 text-[#00E5CC]" />
+                    <ExternalLink className="w-5 h-5 text-[#FF7A1A]" />
                     Export Data
                   </h3>
                   <p className="text-sm text-[#9E9E9E] mb-4">Download payment history for accounting</p>
                   <div className="flex gap-3">
                     <button
                       onClick={() => downloadExport('csv')}
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-[#00FFD4] to-[#00D4FF] rounded-lg font-semibold hover:from-[#00D4FF] hover:to-[#00FFD4] transition-all"
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-[#FF6A00] to-[#F24C00] rounded-lg font-semibold hover:from-[#FF8C42] hover:to-[#FF6A00] transition-all"
                     >
                       Download CSV
                     </button>
                     <button
                       onClick={() => downloadExport('json')}
-                      className="flex-1 px-4 py-2 bg-[#0A2C2D] border border-[#00FFD4]/50 rounded-lg font-semibold hover:bg-[#00FFD4]/10 transition-all"
+                      className="flex-1 px-4 py-2 bg-[#1C1210] border border-[#FF6A00]/50 rounded-lg font-semibold hover:bg-[#FF6A00]/10 transition-all"
                     >
                       Download JSON
                     </button>
@@ -428,22 +428,22 @@ export default function Home() {
                 </div>
 
                 {/* Webhook Tester */}
-                <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20">
+                <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/20">
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-[#00E5CC]" />
+                    <Zap className="w-5 h-5 text-[#FF7A1A]" />
                     Webhook Tester
                   </h3>
                   <p className="text-sm text-[#9E9E9E] mb-4">Simulate test payments</p>
                   <div className="flex gap-3">
                     <button
                       onClick={() => testWebhook('success')}
-                      className="flex-1 px-4 py-2 bg-[#0A2C2D] border border-[#10b981]/50 rounded-lg text-sm font-semibold hover:bg-[#10b981]/10 transition-all"
+                      className="flex-1 px-4 py-2 bg-[#1C1210] border border-[#10b981]/50 rounded-lg text-sm font-semibold hover:bg-[#10b981]/10 transition-all"
                     >
                       ✅ Success
                     </button>
                     <button
                       onClick={() => testWebhook('fraud')}
-                      className="flex-1 px-4 py-2 bg-[#0A2C2D] border border-[#FF6464]/50 rounded-lg text-sm font-semibold hover:bg-[#FF6464]/10 transition-all"
+                      className="flex-1 px-4 py-2 bg-[#1C1210] border border-[#C62828]/50 rounded-lg text-sm font-semibold hover:bg-[#C62828]/10 transition-all"
                     >
                       🚨 Fraud
                     </button>
@@ -458,12 +458,12 @@ export default function Home() {
 
               {/* Revenue Chart */}
               {revenueHistory.length > 0 && (
-                <div className="mb-8 rounded-xl p-6 glass-card border border-[#00FFD4]/30 shadow-2xl glow-cyan-strong">
+                <div className="mb-8 rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/30 shadow-2xl glow-orange-intense">
                   <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#00FFD4]/20 to-[#00D4FF]/10">
-                      <TrendingUp className="w-6 h-6 text-[#00E5CC]" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#FF6A00]/20 to-[#F24C00]/10">
+                      <TrendingUp className="w-6 h-6 text-[#FF7A1A]" />
                     </div>
-                    <span className="bg-gradient-to-r from-[#00FFD4] to-[#00D4FF] bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[#FF6A00] to-[#F24C00] bg-clip-text text-transparent">
                       Revenue Over Time
                     </span>
                   </h2>
@@ -471,12 +471,12 @@ export default function Home() {
                     <AreaChart data={revenueHistory}>
                       <defs>
                         <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#00FFD4" stopOpacity={0.8}/>
-                          <stop offset="50%" stopColor="#00D4FF" stopOpacity={0.3}/>
+                          <stop offset="5%" stopColor="#FF6A00" stopOpacity={0.8}/>
+                          <stop offset="50%" stopColor="#F24C00" stopOpacity={0.3}/>
                           <stop offset="95%" stopColor="#D84315" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#0A1E1F" opacity={0.3} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2A0F0B" opacity={0.3} />
                       <XAxis 
                         dataKey="index" 
                         stroke="#9E9E9E" 
@@ -488,22 +488,22 @@ export default function Home() {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0A2C2D',
-                          border: '1px solid #00FFD4',
+                          backgroundColor: '#1C1210',
+                          border: '1px solid #FF6A00',
                           borderRadius: '12px',
                           boxShadow: '0 0 20px rgba(255, 106, 0, 0.3)'
                         }}
-                        labelStyle={{ color: '#C5D5E0' }}
-                        itemStyle={{ color: '#00E5CC', fontWeight: 'bold' }}
+                        labelStyle={{ color: '#CFCFCF' }}
+                        itemStyle={{ color: '#FF7A1A', fontWeight: 'bold' }}
                       />
                       <Area 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="#00FFD4" 
+                        stroke="#FF6A00" 
                         strokeWidth={3}
                         fill="url(#colorRevenue)"
-                        dot={{ fill: '#00FFD4', r: 5, strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 8, strokeWidth: 2, stroke: '#00D4FF' }}
+                        dot={{ fill: '#FF6A00', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                        activeDot={{ r: 8, strokeWidth: 2, stroke: '#FF8C42' }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -514,30 +514,30 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Token Breakdown */}
                 {tokenData.length > 0 && (
-                  <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20 shadow-2xl">
+                  <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/20 shadow-2xl">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[#00FFD4]/20 to-[#00D4FF]/10">
-                        <DollarSign className="w-5 h-5 text-[#00E5CC]" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[#FF6A00]/20 to-[#F24C00]/10">
+                        <DollarSign className="w-5 h-5 text-[#FF7A1A]" />
                       </div>
-                      <span className="bg-gradient-to-r from-[#00FFD4] to-[#00D4FF] bg-clip-text text-transparent">
+                      <span className="bg-gradient-to-r from-[#FF6A00] to-[#F24C00] bg-clip-text text-transparent">
                         Revenue by Token
                       </span>
                     </h2>
                     <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={tokenData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#0A1E1F" opacity={0.3} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#2A0F0B" opacity={0.3} />
                         <XAxis dataKey="name" stroke="#9E9E9E" style={{ fontSize: '12px' }} />
                         <YAxis stroke="#9E9E9E" style={{ fontSize: '12px' }} />
                         <Tooltip 
                           contentStyle={{ 
-                            backgroundColor: '#0A2C2D',
-                            border: '1px solid #00FFD4',
+                            backgroundColor: '#1C1210',
+                            border: '1px solid #FF6A00',
                             borderRadius: '12px'
                           }}
-                          labelStyle={{ color: '#C5D5E0' }}
-                          itemStyle={{ color: '#00E5CC', fontWeight: 'bold' }}
+                          labelStyle={{ color: '#CFCFCF' }}
+                          itemStyle={{ color: '#FF7A1A', fontWeight: 'bold' }}
                         />
-                        <Bar dataKey="value" fill="#00FFD4" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="value" fill="#FF6A00" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -545,29 +545,29 @@ export default function Home() {
 
                 {/* Endpoint Breakdown */}
                 {endpointData.length > 0 && (
-                  <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20 shadow-2xl">
+                  <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/20 shadow-2xl">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[#00FFD4]/20 to-[#00D4FF]/10">
-                        <Zap className="w-5 h-5 text-[#00E5CC]" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[#FF6A00]/20 to-[#F24C00]/10">
+                        <Zap className="w-5 h-5 text-[#FF7A1A]" />
                       </div>
-                      <span className="bg-gradient-to-r from-[#00FFD4] to-[#00D4FF] bg-clip-text text-transparent">
+                      <span className="bg-gradient-to-r from-[#FF6A00] to-[#F24C00] bg-clip-text text-transparent">
                         Revenue by Endpoint
                       </span>
                     </h2>
                     <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={endpointData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#0A1E1F" opacity={0.3} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#2A0F0B" opacity={0.3} />
                         <XAxis dataKey="name" stroke="#9E9E9E" style={{ fontSize: '11px' }} angle={-15} textAnchor="end" height={80} />
                         <YAxis stroke="#9E9E9E" style={{ fontSize: '12px' }} />
                         <Tooltip 
                           contentStyle={{ 
-                            backgroundColor: '#0A2C2D',
-                            border: '1px solid #00FFD4',
+                            backgroundColor: '#1C1210',
+                            border: '1px solid #FF6A00',
                             borderRadius: '12px'
                           }}
-                          labelStyle={{ color: '#C5D5E0' }}
+                          labelStyle={{ color: '#CFCFCF' }}
                         />
-                        <Bar dataKey="revenue" fill="#00D4FF" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="revenue" fill="#F24C00" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -575,9 +575,9 @@ export default function Home() {
               </div>
 
               {/* Payment Feed */}
-              <div className="rounded-xl p-6 glass-card border border-[#00FFD4]/20 shadow-2xl glow-cyan">
+              <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#FF6A00]/20 shadow-2xl glow-orange">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-[#00FFD4]" />
+                  <Activity className="w-5 h-5 text-[#FF6A00]" />
                   Live Payment Feed
                 </h2>
                 
@@ -594,11 +594,11 @@ export default function Home() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         whileHover={{ scale: 1.03, x: 8 }}
-                        className="flex items-center justify-between p-4 rounded-lg backdrop-blur-xl bg-gradient-to-r from-[#151515]/80 to-[#0A2C2D]/60 border border-[#0A1E1F]/50 hover:border-[#00FFD4]/80 hover:shadow-[0_0_20px_rgba(0,255,212,0.4)] transition-all duration-300"
+                        className="flex items-center justify-between p-4 rounded-lg backdrop-blur-xl bg-gradient-to-r from-[#151515]/80 to-[#1C1210]/60 border border-[#2A0F0B]/50 hover:border-[#FF6A00]/80 hover:shadow-[0_0_20px_rgba(255,106,0,0.3)] transition-all duration-300"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono text-sm text-[#00FFD4] font-bold">
+                            <span className="font-mono text-sm text-[#FF6A00] font-bold">
                               {payment.endpoint}
                             </span>
                             {payment.transaction_hash && payment.transaction_hash !== 'pending' && (
@@ -606,7 +606,7 @@ export default function Home() {
                                 href={`https://explorer.hiro.so/txid/${payment.transaction_hash}?chain=testnet`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-[#00E5CC] hover:text-[#00D4FF] flex items-center gap-1 transition-colors"
+                                className="text-xs text-[#FF7A1A] hover:text-[#FF8C42] flex items-center gap-1 transition-colors"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -625,9 +625,9 @@ export default function Home() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-lg">
-                            {payment.amount} <span className="text-[#00FFD4]">{payment.token}</span>
+                            {payment.amount} <span className="text-[#FF6A00]">{payment.token}</span>
                           </p>
-                          <p className="text-xs text-[#C5D5E0] mt-1 capitalize">{payment.status}</p>
+                          <p className="text-xs text-[#CFCFCF] mt-1 capitalize">{payment.status}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -645,9 +645,9 @@ export default function Home() {
               exit={{ opacity: 0, x: 20 }}
             >
               {/* Credit Search */}
-              <div className="mb-8 rounded-xl p-6 glass-card border border-[#0A1E1F]/50">
+              <div className="mb-8 rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#2A0F0B]/50">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-[#00FFD4]" />
+                  <Award className="w-5 h-5 text-[#FF6A00]" />
                   Agent Credit Score Lookup
                 </h2>
                 <div className="flex gap-4">
@@ -660,7 +660,7 @@ export default function Home() {
                   />
                   <button
                     onClick={searchCredit}
-                    className="px-6 py-3 bg-gradient-to-r from-[#00FFD4] to-[#00D4FF] hover:from-[#00D4FF] hover:to-[#00FFD4] rounded-lg font-semibold transition-all shadow-[0_0_20px_rgba(0,255,212,0.4)] hover:shadow-[0_0_30px_rgba(255,106,0,0.5)]"
+                    className="px-6 py-3 bg-gradient-to-r from-[#FF6A00] to-[#F24C00] hover:from-[#FF8C42] hover:to-[#FF6A00] rounded-lg font-semibold transition-all shadow-[0_0_20px_rgba(255,106,0,0.3)] hover:shadow-[0_0_30px_rgba(255,106,0,0.5)]"
                   >
                     Search
                   </button>
@@ -674,18 +674,18 @@ export default function Home() {
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <div className="text-6xl font-bold text-[#00FFD4]">{creditResult.score}</div>
-                        <div className="text-lg text-[#C5D5E0] mt-2">{creditResult.rating}</div>
+                        <div className="text-6xl font-bold text-[#FF6A00]">{creditResult.score}</div>
+                        <div className="text-lg text-[#CFCFCF] mt-2">{creditResult.rating}</div>
                       </div>
                       <div className="text-right">
                         <div className="text-3xl font-bold text-green-400">{creditResult.discount}% OFF</div>
-                        <div className="text-sm text-[#C5D5E0] mt-1">Eligible Discount</div>
+                        <div className="text-sm text-[#CFCFCF] mt-1">Eligible Discount</div>
                       </div>
                     </div>
                     
                     {creditResult.recommendations && creditResult.recommendations.length > 0 && (
                       <div className="mt-4">
-                        <h4 className="text-sm font-semibold text-[#C5D5E0] mb-2">Recommendations:</h4>
+                        <h4 className="text-sm font-semibold text-[#CFCFCF] mb-2">Recommendations:</h4>
                         <ul className="space-y-1">
                           {creditResult.recommendations.map((rec: string, i: number) => (
                             <li key={i} className="text-sm text-slate-300">• {rec}</li>
@@ -696,9 +696,9 @@ export default function Home() {
                     
                     {/* NEW: Cost Savings Calculator */}
                     {savingsData && !savingsData.error && (
-                      <div className="mt-6 p-6 rounded-lg bg-gradient-to-br from-[#00FFD4]/10 to-[#00D4FF]/5 border border-[#00FFD4]/30">
+                      <div className="mt-6 p-6 rounded-lg bg-gradient-to-br from-[#FF6A00]/10 to-[#F24C00]/5 border border-[#FF6A00]/30">
                         <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                          <DollarSign className="w-5 h-5 text-[#00E5CC]" />
+                          <DollarSign className="w-5 h-5 text-[#FF7A1A]" />
                           💰 Cost Savings
                         </h4>
                         <div className="grid grid-cols-2 gap-4">
@@ -708,11 +708,11 @@ export default function Home() {
                           </div>
                           <div>
                             <p className="text-xs text-[#9E9E9E]">Monthly Savings</p>
-                            <p className="text-2xl font-bold text-[#00E5CC]">{savingsData.monthlySavings} STX</p>
+                            <p className="text-2xl font-bold text-[#FF7A1A]">{savingsData.monthlySavings} STX</p>
                           </div>
                         </div>
-                        <div className="mt-4 p-3 bg-[#0A2C2D]/50 rounded">
-                          <p className="text-sm text-[#C5D5E0]">
+                        <div className="mt-4 p-3 bg-[#1C1210]/50 rounded">
+                          <p className="text-sm text-[#CFCFCF]">
                             💡 <strong>You're saving {creditResult.discount}%</strong> on every transaction thanks to your excellent credit score!
                           </p>
                         </div>
@@ -723,9 +723,9 @@ export default function Home() {
               </div>
 
               {/* Leaderboard */}
-              <div className="rounded-xl p-6 glass-card border border-[#0A1E1F]/50">
+              <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#2A0F0B]/50">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-[#00FFD4]" />
+                  <Users className="w-5 h-5 text-[#FF6A00]" />
                   Top Agents by Credit Score
                 </h2>
                 <div className="space-y-3">
@@ -735,14 +735,14 @@ export default function Home() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      className="flex items-center justify-between p-4 rounded-lg bg-[#151515]/50 border border-[#0A1E1F]/30"
+                      className="flex items-center justify-between p-4 rounded-lg bg-[#151515]/50 border border-[#2A0F0B]/30"
                     >
                       <div className="flex items-center gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                           i === 0 ? 'bg-yellow-500/20 text-yellow-400' :
                           i === 1 ? 'bg-slate-400/20 text-slate-300' :
                           i === 2 ? 'bg-orange-500/20 text-orange-400' :
-                          'bg-slate-700/20 text-[#C5D5E0]'
+                          'bg-slate-700/20 text-[#CFCFCF]'
                         }`}>
                           {i + 1}
                         </div>
@@ -752,7 +752,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-[#00FFD4]">{agent.score}</div>
+                        <div className="text-2xl font-bold text-[#FF6A00]">{agent.score}</div>
                         <div className="text-xs text-green-400">{agent.discount}% discount</div>
                       </div>
                     </motion.div>
@@ -784,12 +784,12 @@ export default function Home() {
               {fraudData && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <StatCard icon={Users} label="Total Addresses" value={fraudData.totalAddresses} />
-                  <StatCard icon={AlertTriangle} label="Fraud Alerts" value={fraudData.fraudulentAddresses} color="#FF6464" />
+                  <StatCard icon={AlertTriangle} label="Fraud Alerts" value={fraudData.fraudulentAddresses} color="#C62828" />
                   <StatCard icon={Shield} label="Fraud Rate" value={`${fraudData.fraudRate}%`} color="#10b981" />
                 </div>
               )}
               
-              <div className="rounded-xl p-6 glass-card border border-[#0A1E1F]/50">
+              <div className="rounded-xl p-6 backdrop-blur-xl bg-[#1C1210]/90 border border-[#2A0F0B]/50">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-red-400" />
                   Security Alerts {fraudData && fraudData.alerts && `(${fraudData.alerts.length} detected)`}
@@ -798,7 +798,7 @@ export default function Home() {
                 {alerts.length === 0 ? (
                   <div className="text-center py-12">
                     <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                    <p className="text-[#C5D5E0]">No security threats detected</p>
+                    <p className="text-[#CFCFCF]">No security threats detected</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -829,7 +829,7 @@ export default function Home() {
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             alert.severity === 'high'
-                              ? 'bg-[#FF6464]/20 text-red-400'
+                              ? 'bg-[#C62828]/20 text-red-400'
                               : 'bg-yellow-500/20 text-yellow-400'
                           }`}>
                             {alert.severity.toUpperCase()}
