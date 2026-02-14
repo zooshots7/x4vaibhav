@@ -36,27 +36,32 @@ app.get('/health', (req, res) => {
 // Payment webhook - called by demo API when payment succeeds
 app.post('/webhook/payment', async (req, res) => {
   try {
-    const { endpoint, amount, token, payer, txHash, timestamp } = req.body;
+    const { endpoint, amount, token, payer, txHash, timestamp, sender_address, transaction_hash, status = 'success', metadata } = req.body;
+    
+    // Support both naming conventions
+    const finalPayer = sender_address || payer;
+    const finalTxHash = transaction_hash || txHash || 'pending';
     
     console.log('💰 Payment webhook received:', {
       endpoint,
       amount,
       token,
-      payer: payer?.substring(0, 10) + '...'
+      payer: finalPayer?.substring(0, 10) + '...',
+      tx: finalTxHash.substring(0, 20) + '...'
     });
     
     // Insert into Supabase
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('payment_events')
       .insert({
         endpoint,
         amount: parseFloat(amount),
         token,
-        status: 'success',
-        sender_address: payer,
-        transaction_hash: txHash || 'pending',
-        api_key: 'demo-api',
-        metadata: { 
+        status,
+        sender_address: finalPayer,
+        transaction_hash: finalTxHash,
+        api_key: 'real-blockchain-payment',
+        metadata: metadata || { 
           timestamp: timestamp || new Date().toISOString(),
           webhook_received: new Date().toISOString()
         }
