@@ -22,8 +22,10 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Area, AreaChart } from 'recharts';
 import MarketplaceTab from '../components/MarketplaceTab';
 import HeroSection from '../components/HeroSection';
+import StackTower3D from '../components/StackTower3D';
+import { Gamepad2 } from 'lucide-react';
 
-type Tab = 'analytics' | 'credit' | 'security' | 'marketplace';
+type Tab = 'analytics' | 'credit' | 'security' | 'marketplace' | 'game';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('analytics');
@@ -341,9 +343,10 @@ export default function Home() {
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8">
+        <div className="flex gap-4 mb-8 flex-wrap">
           {[
             { id: 'analytics' as Tab, label: 'Analytics', icon: Activity },
+            { id: 'game' as Tab, label: '🎮 GAME', icon: Gamepad2 },
             { id: 'credit' as Tab, label: 'Credit Bureau', icon: Award },
             { id: 'marketplace' as Tab, label: 'Marketplace', icon: Store },
             { id: 'security' as Tab, label: 'Security', icon: Shield }
@@ -840,6 +843,18 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'game' && (
+            <motion.div
+              key="game"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <StackTower3D creditScore={creditResult?.score || leaderboard[0]?.score || 750} />
             </motion.div>
           )}
         </AnimatePresence>
