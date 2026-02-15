@@ -4,7 +4,7 @@
 
 The Bloomberg Terminal for x402 payments on Stacks blockchain. While others build payment apps, we built the intelligence layer that makes the entire ecosystem visible, measurable, and trustworthy.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://your-demo-url.vercel.app)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://x4vaibhav-lp1o.vercel.app)
 [![Blockchain](https://img.shields.io/badge/blockchain-verified-blue)](https://explorer.hiro.so/address/ST1Z6ZQD1D8QQH6JBK1VV52SSXSQZT5NCK59BS914?chain=testnet)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -71,7 +71,7 @@ x402Metrics is the **first production-ready analytics dashboard** for the HTTP 4
 
 ## 🚀 Live Demo
 
-**Dashboard:** [https://your-demo-url.vercel.app](https://your-demo-url.vercel.app)
+**Dashboard:** [https://x4vaibhav-lp1o.vercel.app](https://x4vaibhav-lp1o.vercel.app)
 
 **Blockchain Explorer:** [View Wallet on Stacks](https://explorer.hiro.so/address/ST1Z6ZQD1D8QQH6JBK1VV52SSXSQZT5NCK59BS914?chain=testnet)
 
@@ -357,9 +357,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Prize Pool:** $3,000 USD  
 **Submission Date:** February 16, 2026
 
-**GitHub:** [https://github.com/yourusername/x402](https://github.com/yourusername/x402)  
-**Live Demo:** [https://your-demo-url.vercel.app](https://your-demo-url.vercel.app)  
-**Email:** your.email@example.com
+**GitHub:** [https://github.com/zooshots7/x4vaibhav](https://github.com/zooshots7/x4vaibhav)  
+**Live Demo:** [https://x4vaibhav-lp1o.vercel.app](https://x4vaibhav-lp1o.vercel.app)  
+**Backend API:** [https://x4vaibhav-production.up.railway.app](https://x4vaibhav-production.up.railway.app)
 
 ---
 
@@ -371,7 +371,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 🔗 **Real Blockchain** | 📊 **Real-Time Analytics** | 🚨 **Real Fraud Detection**
 
-[Live Demo](https://your-demo-url.vercel.app) • [Documentation](docs/) • [Video](https://youtu.be/your-demo)
+[Live Demo](https://x4vaibhav-lp1o.vercel.app) • [Documentation](docs/) • [Video](#demo-video)
 
 </div>
 
