@@ -23,23 +23,23 @@
 ## 🚀 Deployment
 
 ### Backend (Railway)
-- [ ] Create Railway project
-- [ ] Deploy backend folder
-- [ ] Set environment variables:
-  - [ ] SUPABASE_URL
-  - [ ] SUPABASE_KEY
-  - [ ] FRONTEND_URL (add after Vercel deploy)
-  - [ ] PORT=3001
-- [ ] Test API endpoints
-- [ ] Note Railway URL: __________________
+- [x] Create Railway project
+- [x] Deploy backend folder
+- [x] Set environment variables:
+  - [x] SUPABASE_URL
+  - [x] SUPABASE_KEY
+  - [ ] FRONTEND_URL (update to Vercel URL)
+  - [x] PORT=8080
+- [x] Test API endpoints
+- [x] Railway URL: https://x4vaibhav-production.up.railway.app
 
 ### Frontend (Vercel)
-- [ ] Deploy frontend folder
-- [ ] Set environment variable:
-  - [ ] NEXT_PUBLIC_BACKEND_URL (Railway URL)
+- [x] Deploy frontend folder
+- [x] Set environment variable:
+  - [x] NEXT_PUBLIC_BACKEND_URL (Railway URL)
 - [ ] Test wallet connection
 - [ ] Test all 3 legendary features
-- [ ] Note Vercel URL: __________________
+- [x] Vercel URL: https://x4vaibhav-lp1o.vercel.app
 
 ### Database (Supabase)
 - [x] Already set up with 26 real transactions
