@@ -1,0 +1,26 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#faviconGradient)"/>
+  
+  <!-- 402 Text -->
+  <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">
+    402
+  </text>
+  
+  <!-- Mini Chart Bars -->
+  <g opacity="0.6" transform="translate(12, 48)">
+    <rect x="0" y="6" width="4" height="6" fill="#00FFD4" rx="1"/>
+    <rect x="6" y="4" width="4" height="8" fill="#00FFD4" rx="1"/>
+    <rect x="12" y="2" width="4" height="10" fill="#FFFFFF" rx="1"/>
+    <rect x="18" y="0" width="4" height="12" fill="#FFFFFF" rx="1"/>
+    <rect x="24" y="3" width="4" height="9" fill="#00FFD4" rx="1"/>
+    <rect x="30" y="5" width="4" height="7" fill="#00FFD4" rx="1"/>
+  </g>
+  
+  <defs>
+    <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A8FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0080FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
