@@ -37,7 +37,8 @@ export default function FraudDashboard() {
 
   const fetchPatterns = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/fraud/patterns');
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const res = await fetch(`${backendUrl}/api/fraud/patterns`);
       const data = await res.json();
       setPatterns(data.patterns || []);
       setLoading(false);
@@ -55,7 +56,8 @@ export default function FraudDashboard() {
       setBlockedAddresses(newBlocked);
 
       // Call backend to block
-      await fetch('http://localhost:3001/api/security/block', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      await fetch(`${backendUrl}/api/security/block`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ addresses, pattern: patternType, auto })
@@ -77,7 +79,8 @@ export default function FraudDashboard() {
       setBlockedAddresses(newBlocked);
 
       // Call backend to whitelist
-      await fetch('http://localhost:3001/api/security/whitelist', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      await fetch(`${backendUrl}/api/security/whitelist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ addresses })

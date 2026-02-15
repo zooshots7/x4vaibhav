@@ -29,7 +29,8 @@ export default function TransactionMap() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/map/transactions?limit=50');
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const res = await fetch(`${backendUrl}/api/map/transactions?limit=50`);
       const data = await res.json();
       setTransactions(data.transactions || []);
       setLoading(false);

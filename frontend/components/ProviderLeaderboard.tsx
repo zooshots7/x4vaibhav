@@ -13,6 +13,9 @@ interface ProviderStats {
   avg_payment: number;
   endpoints: string[];
   rank: number;
+  reputation: number; // 0-1000 score
+  uptime: number; // percentage
+  successRate: number; // percentage
 }
 
 export default function ProviderLeaderboard() {
@@ -27,7 +30,8 @@ export default function ProviderLeaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/leaderboard/providers?limit=10');
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const res = await fetch(`${backendUrl}/api/leaderboard/providers?limit=10`);
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
       setLoading(false);

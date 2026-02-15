@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster, toast } from 'react-hot-toast';
+import { API_URL, WS_URL } from '@/lib/config';
 import { 
   Activity, 
   DollarSign, 
@@ -29,13 +29,16 @@ import ProviderLeaderboard from '../components/ProviderLeaderboard';
 import TransactionMap from '../components/TransactionMap';
 import FraudDashboard from '../components/FraudDashboard';
 
+// Disable static generation for this page (uses Socket.io)
+export const dynamic = 'force-dynamic';
+
 type Tab = 'analytics' | 'credit' | 'security' | 'marketplace';
 
 export default function Home() {
   const { isConnected, address, currentView, switchRole } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('analytics');
   const [connected, setConnected] = useState(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<any>(null);
 
   const [stats, setStats] = useState({
     totalRevenue: '0.000000',
@@ -72,18 +75,18 @@ export default function Home() {
       // Build query params with wallet and role
       const walletParam = address ? `?wallet=${address}&role=${currentView}` : '';
       
-      const statsRes = await fetch(`http://localhost:3001/api/stats${walletParam}`);
+      const statsRes = await fetch(`${API_URL}/api/stats${walletParam}`);
       const statsData = await statsRes.json();
       setStats(statsData);
 
-      const paymentsRes = await fetch(`http://localhost:3001/api/payments/recent?limit=20${address ? `&wallet=${address}&role=${currentView}` : ''}`);
+      const paymentsRes = await fetch(`${API_URL}/api/payments/recent?limit=20${address ? `&wallet=${address}&role=${currentView}` : ''}`);
       const paymentsData = await paymentsRes.json();
       setPayments(paymentsData);
       
       buildRevenueHistory(paymentsData);
       
       // Fetch token breakdown
-      const tokenRes = await fetch(`http://localhost:3001/api/analytics/by-token${walletParam}`);
+      const tokenRes = await fetch(`${API_URL}/api/analytics/by-token${walletParam}`);
       const tokenBreakdown = await tokenRes.json();
       const tokenChartData = Object.entries(tokenBreakdown).map(([token, amount]: any) => ({
         name: token,
@@ -92,7 +95,7 @@ export default function Home() {
       setTokenData(tokenChartData);
       
       // Fetch endpoint breakdown
-      const endpointRes = await fetch(`http://localhost:3001/api/analytics/by-endpoint${walletParam}`);
+      const endpointRes = await fetch(`${API_URL}/api/analytics/by-endpoint${walletParam}`);
       const endpointBreakdown = await endpointRes.json();
       const endpointChartData = Object.entries(endpointBreakdown).map(([endpoint, data]: any) => ({
         name: endpoint.replace('/api/', ''),
@@ -108,7 +111,7 @@ export default function Home() {
   // Fetch credit data
   const fetchCreditData = async () => {
     try {
-      const leaderboardRes = await fetch('http://localhost:3001/api/credit/leaderboard?limit=10');
+      const leaderboardRes = await fetch(`${API_URL}/api/credit/leaderboard?limit=10`);
       const leaderboardData = await leaderboardRes.json();
       setLeaderboard(leaderboardData);
     } catch (error) {
@@ -119,7 +122,7 @@ export default function Home() {
   // Fetch security data
   const fetchSecurityData = async () => {
     try {
-      const alertsRes = await fetch('http://localhost:3001/api/security/alerts');
+      const alertsRes = await fetch(`${API_URL}/api/security/alerts`);
       const alertsData = await alertsRes.json();
       setAlerts(alertsData);
     } catch (error) {
@@ -130,11 +133,11 @@ export default function Home() {
   // Fetch marketplace data
   const fetchMarketplaceData = async () => {
     try {
-      const providersRes = await fetch('http://localhost:3001/api/providers');
+      const providersRes = await fetch(`${API_URL}/api/providers`);
       const providersData = await providersRes.json();
       setProviders(providersData);
       
-      const trendingRes = await fetch('http://localhost:3001/api/trending?limit=5');
+      const trendingRes = await fetch(`${API_URL}/api/trending?limit=5`);
       const trendingData = await trendingRes.json();
       setTrending(trendingData);
     } catch (error) {
@@ -161,12 +164,12 @@ export default function Home() {
   const searchCredit = async () => {
     if (!searchAddress) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/credit/${searchAddress}`);
+      const res = await fetch(`${API_URL}/api/credit/${searchAddress}`);
       const data = await res.json();
       setCreditResult(data);
       
       // NEW: Also fetch savings data
-      const savingsRes = await fetch(`http://localhost:3001/api/savings/${searchAddress}`);
+      const savingsRes = await fetch(`${API_URL}/api/savings/${searchAddress}`);
       const savingsInfo = await savingsRes.json();
       setSavingsData(savingsInfo);
     } catch (error) {
@@ -180,7 +183,7 @@ export default function Home() {
   // Download export
   const downloadExport = async (format: 'csv' | 'json') => {
     try {
-      const url = `http://localhost:3001/api/export/${format}`;
+      const url = `${API_URL}/api/export/${format}`;
       const link = document.createElement('a');
       link.href = url;
       link.download = `x402metrics-export.${format}`;
@@ -196,7 +199,7 @@ export default function Home() {
   // Test webhook
   const testWebhook = async (scenario: string) => {
     try {
-      const res = await fetch('http://localhost:3001/api/test/webhook', {
+      const res = await fetch(`${API_URL}/api/test/webhook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scenario })
@@ -215,7 +218,7 @@ export default function Home() {
   // Fetch fraud data
   const fetchFraudData = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/fraud/analytics');
+      const res = await fetch(`${API_URL}/api/fraud/analytics`);
       const data = await res.json();
       setFraudData(data);
     } catch (error) {
@@ -226,7 +229,7 @@ export default function Home() {
   // Fetch heatmap data
   const fetchHeatmapData = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/heatmap');
+      const res = await fetch(`${API_URL}/api/heatmap`);
       const data = await res.json();
       setHeatmapData(data);
     } catch (error) {
@@ -235,9 +238,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const newSocket = io(process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001');
-    
-    newSocket.on('connect', () => {
+    // Dynamically import socket.io-client (client-side only)
+    import('socket.io-client').then(({ io }) => {
+      const newSocket = io(WS_URL);
+      
+      newSocket.on('connect', () => {
       console.log('✅ Connected to backend');
       setConnected(true);
       fetchData();
@@ -283,11 +288,13 @@ export default function Home() {
       );
     });
 
-    setSocket(newSocket);
+      setSocket(newSocket);
 
-    return () => {
-      newSocket.close();
-    };
+      // Cleanup on unmount
+      return () => {
+        newSocket.close();
+      };
+    });
   }, []);
 
   // Re-fetch data when wallet or role changes

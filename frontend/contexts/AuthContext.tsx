@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AppConfig, UserSession } from '@stacks/auth';
 import { authenticate } from '@stacks/connect';
-import { StacksTestnet } from '@stacks/network';
 
 interface AuthContextType {
   userSession: UserSession | null;
@@ -114,9 +113,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const connectWallet = async () => {
     try {
       await authenticate({
-        userSession,
-        onFinish: ({ userSession: newUserSession }) => {
-          const userData = newUserSession.loadUserData();
+        appDetails: {
+          name: 'x402Metrics',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/logo.png' : ''
+        },
+        onFinish: (payload: any) => {
+          const userData = userSession.loadUserData();
           const walletAddress = userData.profile.stxAddress.testnet;
           setAddress(walletAddress);
           setIsConnected(true);
@@ -133,8 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
           }).catch(console.error);
         },
-        onCancel: (error) => {
-          console.log('User canceled authentication:', error);
+        onCancel: () => {
+          console.log('User canceled authentication');
         }
       });
     } catch (error) {
